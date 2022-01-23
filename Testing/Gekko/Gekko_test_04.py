@@ -30,29 +30,29 @@ tf = m.FV(value=1.0,lb=0.1,ub=final_time) #FV is a fixed value variable
 tf.STATUS = 1 #STATUS = 1 means the optimzer can minimize the function
 
 # Parameters of the problem
-G =  m.Const(6.674*10**(-11)) #Gravitational Constant
-M =  m.Const(7.346*10**(22))  #Mass of the Moon
-R0 =  1738100       #Radius of the lunar surface
+G =  m.Const(6.674*10**(-11), name='G') #Gravitational Constant
+M =  m.Const(7.346*10**(22), name='M')  #Mass of the Moon
+R0 =  m.Const(1738100, name='R0')       #Radius of the lunar surface
 
-Ft =  m.Const(15346)          #thrust force of engine
-M0 =  m.Const(4821)          #Wet Mass of rocket
-M_dot =  m.Const(5.053)       #Mass flow rate of propellant
+Ft =  m.Const(15346, name='Ft')          #thrust force of engine
+M0 =  m.Const(4821, name='M0')          #Wet Mass of rocket
+M_dot =  m.Const(5.053, name='M_dot')       #Mass flow rate of propellant
 
-Rfmin = 86904+R0  #Minimum final orbital radius
-Rfmax = 106217+R0   #Maximum final orbital radius
+Rfmin = m.Const(86904+R0, name ='Rfmin')  #Minimum final orbital radius
+Rfmax = m.Const(106217+R0, name ='Rfmax')  #Maximum final orbital radius
 
 
 # Position variables
 y = m.Var(value=R0,name='y')
-ydot = m.Var(name='ydot')
-ydoubledot = m.Var(name='ydoubledot')
+ydot = m.Var(value = 10, name='ydot')
+ydoubledot = m.Var(value = 1, name='ydoubledot')
 
 x = m.Var(value=1, name='x')
-xdot = m.Var(name='xdot')
-xdoubledot = m.Var(name='xdoubledot')
+xdot = m.Var(value = 100, name='xdot')
+xdoubledot = m.Var(value = 1.5, name='xdoubledot')
 
-mass = m.Var(value=4821, lb = 1000, name='mass') #lb, ub are upper and lower bounds respectively
-theta = m.Var(name='theta') #May require to be changed to MV
+mass = m.Var(value=4821, lb = 1000, ub = M0, name='mass') #lb, ub are upper and lower bounds respectively
+theta = m.Var(name='theta', lb = 0, ub = 3.14159265359, value=2) #May require to be changed to MV
 #theta.STATUS = 1
 
 
@@ -179,22 +179,6 @@ ax.set_xlabel('Time, sec')
 ax.grid()
 
 
-'''
-fig2 = plt.figure()
-ax = fig2.add_subplot()
-ax.plot(tdirect, ydirect)
-ax.set_title('y, m')
-ax.set_xlabel('Time, sec')
-ax.grid()
-
-
-
-fig4 = plt.figure()
-ax = fig4.add_subplot()
-ax.plot(tdirect, ydotdirect)
-ax.set_title(r'$V_y$, m/s')
-ax.set_xlabel('Time, sec')
-ax.grid()'''
 
 
 plt.show()
