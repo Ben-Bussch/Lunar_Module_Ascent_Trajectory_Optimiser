@@ -19,8 +19,8 @@ m.time = np.linspace(0,1,nt)
 # options
 m.options.NODES = 2 #The number of collocation points between each timestep
 m.options.SOLVER = 1 #1 = APOPT, 3 = IPOPT 
-m.options.IMODE = 6  #Tells gekko the problem has dynamics and is an optimal control problem
-m.options.MAX_ITER = 10000
+m.options.IMODE = 6  #Tells gekko the problem is an optimal control problem
+m.options.MAX_ITER = 100000 #Oh boi I'm gonna run this all night
 m.options.MV_TYPE = 0 #How the interpolation between Manipulated variables (MVs) is done
 m.options.DIAGLEVEL = 2
 
