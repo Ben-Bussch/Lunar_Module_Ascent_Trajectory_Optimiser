@@ -12,16 +12,19 @@ from gekko import GEKKO
 # create GEKKO model
 m = GEKKO()
 
-nt = 300 #number of timesteps
+nt = 301 #number of timesteps
 # scale 0-1 time with tf
 m.time = np.linspace(0,1,nt)
 
 # options
-m.options.NODES = 2 #The number of collocation points between each timestep
-m.options.SOLVER = 1 #1 = APOPT, 3 = IPOPT 
+m.options.NODES = 4 #The number of collocation points between each timestep
+m.options.SOLVER = 3 #1 = APOPT, 3 = IPOPT 
 m.options.IMODE = 6  #Tells gekko the problem is an optimal control problem
-m.options.MAX_ITER = 100000 #Oh boi I'm gonna run this all night
+m.options.MAX_ITER = 1000 
 m.options.MV_TYPE = 0 #How the interpolation between Manipulated variables (MVs) is done
+#m.options.COLDSTART= 2 #Should help find bad constraint
+m.options.OTOL = 1e-2 #Default of 1e-6, but should be a helping start
+m.options.RTOL = 1e-2
 m.options.DIAGLEVEL = 2
 
 # final time
@@ -51,8 +54,8 @@ x = m.Var(value=1, name='x')
 xdot = m.Var(value = 100, name='xdot')
 xdoubledot = m.Var(value = 1.5, name='xdoubledot')
 
-mass = m.Var(value=4821, lb = 1000, ub = M0, name='mass') #lb, ub are upper and lower bounds respectively
-theta = m.Var(name='theta', lb = 0, ub = 3.14159265359, value=2) #May require to be changed to MV
+mass = m.Var(value=4821, lb = 2245, ub = M0, name='mass') #lb, ub are upper and lower bounds respectively
+theta = m.MV(name='theta', lb = -3.1415926, ub = 3.1415926, value=2) #May require to be changed to MV
 #theta.STATUS = 1
 
 
@@ -67,12 +70,12 @@ m.Equation(mass.dt() == -M_dot*tf) #Expression for mass
 
 
 #System dynamics:
-m.Equation(xdoubledot == ( (Ft/(mass*(x**2 + y**2)**(1/2)))*(x*m.cos(theta)-y*m.sin(theta)) )\
-           - x*(G*M/((x**2 + y**2)**(3/2)))\
+m.Equation(xdoubledot == tf*(( (Ft/(mass*(x**2 + y**2)**(1/2)))*(x*m.cos(theta)-y*m.sin(theta)) )\
+           - x*(G*M/((x**2 + y**2)**(3/2))))\
            )
                         
-m.Equation(ydoubledot == ( (Ft/(mass*(x**2 + y**2)**(1/2)))*(y*m.cos(theta)+x*m.sin(theta)) )\
-           - y*(G*M/((x**2 + y**2)**(3/2)))\
+m.Equation(ydoubledot == tf*(( (Ft/(mass*(x**2 + y**2)**(1/2)))*(y*m.cos(theta)+x*m.sin(theta)) )\
+           - y*(G*M/((x**2 + y**2)**(3/2))))\
            )
 
 
@@ -177,8 +180,5 @@ ax.plot(ts,theta.value)
 ax.set_title('pheta')
 ax.set_xlabel('Time, sec')
 ax.grid()
-
-
-
 
 plt.show()
