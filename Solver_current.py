@@ -182,3 +182,113 @@ ax.set_xlabel('Time, sec')
 ax.grid()
 
 plt.show()
+
+'''IPOPT results after 1000 iterations:
+    Number of Iterations....: 1000
+
+                                       (scaled)                 (unscaled)
+    Objective...............:   7.9813943414888072e+08    7.1832549073399267e+09
+    Dual infeasibility......:   3.9191396300710375e+13    3.5272256670639338e+14
+    Constraint violation....:   5.4864024536848068e+04    3.1566804735840803e+08
+    Complementarity.........:   1.0000000000000002e+13    9.0000000000000016e+13
+    Overall NLP error.......:   5.4864024536848068e+04    3.5272256670639338e+14
+
+
+    Number of objective function evaluations             = 12580
+    Number of objective gradient evaluations             = 924
+    Number of equality constraint evaluations            = 12586
+    Number of inequality constraint evaluations          = 12586
+    Number of equality constraint Jacobian evaluations   = 1023
+    Number of inequality constraint Jacobian evaluations = 1023
+    Number of Lagrangian Hessian evaluations             = 1000
+    Total CPU secs in IPOPT (w/o function evaluations)   =  11277.210
+    Total CPU secs in NLP function evaluations           =    578.209
+
+    EXIT: Maximum Number of Iterations Exceeded.
+     
+     An error occured.
+     The error code is           -1
+     
+     
+     ---------------------------------------------------
+     Solver         :  IPOPT (v3.12)
+     Solution time  :    11893.4746000000      sec
+     Objective      :    7183254907.33993     
+     Unsuccessful with error code            0
+     ---------------------------------------------------
+     
+     Creating file: infeasibilities.txt
+     Use command apm_get(server,app,'infeasibilities.txt') to retrieve file
+     Called files(          21 )
+     Called files(           2 )
+     Called files(          53 )
+     WRITE dbs FILE
+     Called files(          56 )
+     WRITE json FILE
+     Called files(           2 )
+     Called files(           3 )
+     Called files(          21 )
+     Called files(          23 )
+     Called files(          11 )
+     Files(11): File Read warm.t0 F
+     files: warm.t0 does not exist
+     Called files(          12 )
+     Files(12): File Read lam.t0 F
+     files: lam.t0 does not exist
+    Timer #     1   11898.92/       1 =   11898.92 Total system time
+    Timer #     2   11893.47/       1 =   11893.47 Total solve time
+    Timer #     3      59.93/   12580 =       0.00 Objective Calc: apm_p
+    Timer #     4       6.94/     925 =       0.01 Objective Grad: apm_g
+    Timer #     5      57.34/   12586 =       0.00 Constraint Calc: apm_c
+    Timer #     6       0.00/       1 =       0.00 Sparsity: apm_s
+    Timer #     7       5.05/    1024 =       0.00 1st Deriv #1: apm_a1
+    Timer #     8       0.00/       0 =       0.00 1st Deriv #2: apm_a2
+    Timer #     9       0.24/    1200 =       0.00 Custom Init: apm_custom_init
+    Timer #    10       0.01/    1200 =       0.00 Mode: apm_node_res::case 0
+    Timer #    11       0.01/    3600 =       0.00 Mode: apm_node_res::case 1
+    Timer #    12       0.12/    1200 =       0.00 Mode: apm_node_res::case 2
+    Timer #    13       0.00/    2400 =       0.00 Mode: apm_node_res::case 3
+    Timer #    14     282.37/30206400 =       0.00 Mode: apm_node_res::case 4
+    Timer #    15      70.72/ 2338800 =       0.00 Mode: apm_node_res::case 5
+    Timer #    16      80.19/ 1176000 =       0.00 Mode: apm_node_res::case 6
+    Timer #    17       3.91/    1025 =       0.00 Base 1st Deriv: apm_jacobian
+    Timer #    18       0.00/       0 =       0.00 Base 1st Deriv: apm_condensed_jacobian
+    Timer #    19       0.01/       2 =       0.01 Non-zeros: apm_nnz
+    Timer #    20       0.00/       0 =       0.00 Count: Division by zero
+    Timer #    21       0.00/       0 =       0.00 Count: Argument of LOG10 negative
+    Timer #    22       0.00/       0 =       0.00 Count: Argument of LOG negative
+    Timer #    23       0.00/       0 =       0.00 Count: Argument of SQRT negative
+    Timer #    24       0.00/       0 =       0.00 Count: Argument of ASIN illegal
+    Timer #    25       0.00/       0 =       0.00 Count: Argument of ACOS illegal
+    Timer #    26       0.00/       1 =       0.00 Extract sparsity: apm_sparsity
+    Timer #    27       0.01/      32 =       0.00 Variable ordering: apm_var_order
+    Timer #    28       0.00/       0 =       0.00 Condensed sparsity
+    Timer #    29       0.73/       2 =       0.36 Hessian Non-zeros
+    Timer #    30       0.04/       7 =       0.01 Differentials
+    Timer #    31       5.01/     978 =       0.01 Hessian Calculation
+    Timer #    32       3.03/     981 =       0.00 Extract Hessian
+    Timer #    33       0.02/       2 =       0.01 Base 1st Deriv: apm_jac_order
+    Timer #    34       0.01/       1 =       0.01 Solver Setup
+    Timer #    35   11311.84/       1 =   11311.84 Solver Solution
+    Timer #    36       6.87/   12600 =       0.00 Number of Variables
+    Timer #    37       0.01/       8 =       0.00 Number of Equations
+    Timer #    38       4.14/      31 =       0.13 File Read/Write
+    Timer #    39       0.01/       1 =       0.01 Dynamic Init A
+    Timer #    40       0.48/       1 =       0.48 Dynamic Init B
+    Timer #    41       0.14/       1 =       0.14 Dynamic Init C
+    Timer #    42       0.01/       1 =       0.01 Init: Read APM File
+    Timer #    43       0.00/       1 =       0.00 Init: Parse Constants
+    Timer #    44       0.00/       1 =       0.00 Init: Model Sizing
+    Timer #    45       0.00/       1 =       0.00 Init: Allocate Memory
+    Timer #    46       0.00/       1 =       0.00 Init: Parse Model
+    Timer #    47       0.00/       1 =       0.00 Init: Check for Duplicates
+    Timer #    48       0.00/       1 =       0.00 Init: Compile Equations
+    Timer #    49       0.00/       1 =       0.00 Init: Check Uninitialized
+    Timer #    50      -0.00/    1223 =      -0.00 Evaluate Expression Once
+    Timer #    51       0.00/       0 =       0.00 Sensitivity Analysis: LU Factorization
+    Timer #    52       0.00/       0 =       0.00 Sensitivity Analysis: Gauss Elimination
+    Timer #    53       0.00/       0 =       0.00 Sensitivity Analysis: Total Time
+     @error: Solution Not Found
+    Not successful
+    http://byu.apmonitor.com
+    gk_model0'''
