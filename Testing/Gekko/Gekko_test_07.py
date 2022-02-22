@@ -8,6 +8,7 @@ Created on Thu Jan 27 22:31:41 2022
 import numpy as np
 import matplotlib.pyplot as plt
 from gekko import GEKKO
+from gekko import *
 
 # create GEKKO model
 m = GEKKO()
@@ -23,8 +24,8 @@ m.options.IMODE = 6  #Tells gekko the problem is an optimal control problem
 m.options.MAX_ITER = 20000 
 m.options.MV_TYPE = 0 #How the interpolation between Manipulated variables (MVs) is done
 #m.options.COLDSTART= 2 #Should help find bad constraint
-m.options.OTOL = 1e-3 #Default of 1e-6, but should be a helping start
-m.options.RTOL = 1e-3
+m.options.OTOL = 1e-3 #allows for margins of error in solution, default of 1e-6
+m.options.RTOL = 1e-3 #same as above
 m.options.DIAGLEVEL = 0
 
 # final time
@@ -55,7 +56,8 @@ xdot = m.Var(value = 100, name='xdot')
 xdoubledot = m.Var(value = 1.5, name='xdoubledot')'''
 
 mass = m.Var(value=4821, lb = 2245, ub = M0, name='mass') #lb, ub are upper and lower bounds respectively
-#theta = m.Var(name='theta') #May require to be changed to MV
+
+#theta = m.Var(name='theta', lb = -np.pi, ub = np.pi) #May require to be changed to MV
 
 angle = m.MV(name='angle', value = 0, lb=-1, ub=1) #Idealy, this would be replaced by a trig function
 angle.DPRED
@@ -64,7 +66,7 @@ angle.STATUS = 1 #Allows computer to change theta
 angle.DCOST = 1e-5 #Adds a very small cost to changes in theta
 angle.REQONCTRL = 1
 
-#print(m.cos(5))
+
 
 
 
@@ -73,13 +75,16 @@ m.Equation(y.dt()==tf*ydot) #Expression for y velocity
 m.Equation(ydot.dt() == tf*ydoubledot) #Expression for y acceleration
 
 m.Equation(mass.dt() == -M_dot*tf) #Expression for mass
-#m.Equation(theta.dt() == thetadot*tf) #Expression for mass
+#m.Equation(theta.dt() == thetadot*tf) 
 
 #System dynamics:
-#m.Equation(theta == m.cos(angle))
-m.Equation(ydoubledot == (Ft/mass)*angle-((G*M)/(y**2)))    
+#m.Equation(angle == m.cos(theta) )
+'''
 m.Equation(angle >= 0) 
-m.Equation(angle <= 3.14159) 
+m.Equation(angle <= 3.14159) '''
+
+m.Equation(ydoubledot == (Ft/mass)*angle-((G*M)/(y**2)))    
+
 
 #Constraints
 m.Equation(y >= R0)
