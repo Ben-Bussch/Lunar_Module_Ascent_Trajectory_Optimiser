@@ -20,7 +20,7 @@ m.time = np.linspace(0,1,nt)
 m.options.NODES = 4 #The number of collocation points between each timestep
 m.options.SOLVER = 3 #1 = APOPT, 3 = IPOPT 
 m.options.IMODE = 6  #Tells gekko the problem is an optimal control problem
-m.options.MAX_ITER = 1000 
+m.options.MAX_ITER = 50 
 m.options.MV_TYPE = 0 #How the interpolation between Manipulated variables (MVs) is done
 #m.options.COLDSTART= 2 #Should help find bad constraint
 m.options.OTOL = 1e-2 #Default of 1e-6, but should be a helping start
