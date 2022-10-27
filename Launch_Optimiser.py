@@ -105,7 +105,7 @@ class Solver:
                - (x*Scalar)*(G*M/(((x*Scalar)**2 + (y*Scalar+R0)**2)**(3/2))))/ Scalar\
                )
     """For more information about the governing equations and system dynamics, 
-    reffer to the Lunar_Module_Trajectory_Optimiser.docx file attached on the github page.
+    reffer to the Lunar_Module_Trajectory_Optimisation.pdf file attached on the github page.
     This document was written as a school assessment, so apologies for the unconventional formating"""
     
     """Initial Boundary Conditions:""" 
