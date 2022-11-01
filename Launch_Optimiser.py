@@ -13,6 +13,7 @@ from gekko import *
 
 class Solver:
     
+    
     """Setting up the solver"""
     
     m = GEKKO()
@@ -40,21 +41,33 @@ class Solver:
     
     
     """Constants"""
-    G =  m.Const(6.674*10**(-11), name='G') #Gravitational Constant
-    M =  m.Const(7.346*10**(22), name='M')  #Mass of the Moon in kg
-    R0 =  m.Const(1738100, name='R0')       #Radius of the lunar surface in meters
+    
+    """Constants have been defined twice, once as normal python variables,
+    to be able to use in general arithmatics, and once as GEKKO constants,
+    which was done to help trouble shoot the model when testing. '_py' was
+    used to denote the duplicate of constants for normal python variable"""
+    
+    G_py = 6.674*10**(-11)  #Gravitational Constant
+    M_py = 7.346*10**(22)   #Mass of the Moon in kg
+    R0_py = 1738100         #Radius of the lunar surface in meters
+    
+    #Gekko variables of constants    
+    G  =  m.Const(G_py, name='G')       
+    M  =  m.Const(M_py, name='M')       
+    R0 =  m.Const(R0_py, name='R0')     
     
 
     """Rocket Parameters"""
     Ft =  m.Const(15346, name='Ft')         #thrust force of engine in Newtons
     M0 =  m.Const(4821, name='M0')          #Wet Mass of rocket, in kg
-    M_dot =  m.Const(5.053, name='M_dot')   #Mass flow rate of propellant, kg/s 
+    M_dot =  m.Const(5.053, name='M_dot')   #Mass flow rate of propellant, kg/s
     mflow = 5.053/2376
     
     
     """"Orbit Parameters """
-    Rfmin = m.Const(53108.4, name ='Rfmin') #final height of orbit, m    
-    orbital_v = ((6.674*10**(-11)*7.346*10**(22))/(1738100+53108.4))**(1/2)
+    Rfmin_py = 53108.4    #Final orbit height from lunar surface 
+    Rfmin = m.Const(Rfmin_py, name ='Rfmin') #final height of orbit, m    
+    orbital_v = ((G_py*M_py)/R0_py)**(1/2)
     #print(orbital_v)
      
 
@@ -77,9 +90,12 @@ class Solver:
     angle.REQONCTRL = 3 #tells solver whether to change MVs or run as simulator
     
     
-    """"Scalars --it is crucial to have all the variables change at a similar scale to each other"""
-    Scalar = m.Const(53108.4, name = 'distance Scale')
-    mass_scalar = m.Const(2576, name = 'mass Scale')
+    """"Scalars --it is crucial to have all the variables change at a similar scale to each other
+    The final orbit height is used as the distance scale factor, the max fuel mass is used as 
+    the mass scale factor"""
+    
+    Scalar = m.Const(Rfmin_py, name = 'distance Scale') 
+    mass_scalar = m.Const(2376, name = 'mass Scale') #The fuel mass of the rocket
     
     
     """Governing Equations"""
@@ -146,12 +162,12 @@ class Solver:
 
     # scaled time
     ts = m.time * tf.value[0]
-    print('final y',y.value[-1]*53108.4)
-    print('final x', x.value[-1]*8690)
-    print('final ydot',ydot.value[-1]*53108.4)
-    print('final xdot', xdot.value[-1]*53108.4)
-    print('final ydoubledot',ydoubledot.value[-1]*53108.4)
-    print('final xdoubledot', xdoubledot.value[-1]*53108.4)
+    print('final y',y.value[-1]*Rfmin_py)
+    print('final x', x.value[-1]*Rfmin_py)
+    print('final ydot',ydot.value[-1]*Rfmin_py)
+    print('final xdot', xdot.value[-1]*Rfmin_py)
+    print('final ydoubledot',ydoubledot.value[-1]*Rfmin_py)
+    print('final xdoubledot', xdoubledot.value[-1]*Rfmin_py)
     print('final time', tf.value[0]*final_time)
     
     pos_factor = 53108.4
@@ -160,14 +176,14 @@ class Solver:
     x_pos_list = [0]*len(x.value)
     theta_list = [0]*len(x.value)
     for i in range(len(x.value)):
-        x_pos_list[i] = -x.value[i]*53108.4
-        y_pos_list[i] = y.value[i]*53108.4+pos_offset
-        theta_list[i] = 3*angle.value[i]*(360/(2*np.pi))
+        x_pos_list[i] = -x.value[i]*Rfmin_py
+        y_pos_list[i] = y.value[i]*Rfmin_py+R0_py
+        theta_list[i] = 3*angle.value[i]*(180/(np.pi))
     
     angle_1 = np.linspace(0, 2*np.pi, 100)
     radius = 1738100
-    a = radius*np.cos(angle_1)
-    b = radius*np.sin(angle_1)
+    a = R0_py*np.cos(angle_1)
+    b = R0_py*np.sin(angle_1)
     
     plt1 = plt.figure()
     ax = plt1.add_subplot()
@@ -178,16 +194,16 @@ class Solver:
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    plt.savefig('takeoff_alone.png', dpi=300)
+    #plt.savefig('takeoff_contextualized.png', dpi=300)
     
     plt2 = plt.figure()
     ax = plt2.add_subplot()
-    plt.plot(470*ts,theta_list)
+    plt.plot(final_time*ts,theta_list)
     ax.set_title('Angle')
     plt.ylabel('Angle / degrees')
     ax.set_xlabel('time')
     ax.grid()
-    plt.savefig('angle.png', dpi=300)
+    #plt.savefig('Angle_vs_Time.png', dpi=300)
     
     plt3 = plt.figure()
     ax = plt3.add_subplot()
@@ -197,7 +213,7 @@ class Solver:
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    plt.savefig('takeoff_context.png', dpi=300)
+    #plt.savefig('takeoff_trajectory.png', dpi=300)
     
     plt.show()
 
