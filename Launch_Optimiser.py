@@ -67,12 +67,12 @@ class Solver:
     
     
     """"Orbit Parameters """
-    r_periapsis = 17703
-    r_apoapsis = 88615
+    r_periapsis = 17703                                 #Final orbit periapsis from lunar surface, m
+    r_apoapsis = 88615                                  #Final orbit apoapsis from lunar surface, m
     r_avg = (r_periapsis+r_apoapsis)/2
-    Rfmin_py = r_periapsis                          #Final orbit periapsis, from lunar surface 
-    Rfmin = m.Const(Rfmin_py, name ='Rfmin')        #final height of orbit, m    
-    periapsis_v = ((G_py*M_py)/(R0_py+r_avg))**(1/2)
+    Rfmin_py = r_periapsis                              #final height of launch, which will be the orbit's periapsis                      
+    Rfmin = m.Const(Rfmin_py, name ='Rfmin')                
+    periapsis_v = ((G_py*M_py)/(R0_py+r_avg))**(1/2)    #Velocity at end of launch
     
     """The periapsis velocity (periapsis_v) is calculated by finding the velocity
     the rocket would have in a circular orbit of radius (r_apoapsis+r_periapsis)/2. """
