@@ -61,14 +61,22 @@ class Solver:
     Ft =  m.Const(15346, name='Ft')         #thrust force of engine in Newtons
     M0 =  m.Const(4821, name='M0')          #Wet Mass of rocket, in kg
     M_dot =  m.Const(5.053, name='M_dot')   #Mass flow rate of propellant, kg/s
-    mflow = 5.053/2376
+    fuel_mass = 2376                        #Mass of fuel, kg
+    mflow = 5.053/fuel_mass
+    angle_doubledot_max = 5e-4             #max angular acceleration (just a guess for now) in radians per second squared
     
     
     """"Orbit Parameters """
-    Rfmin_py = 53108.4    #Final orbit height from lunar surface 
+    r_periapsis = 17703
+    r_apoapsis = 88515
+    Rfmin_py = 17703                         #Final orbit periapsis, from lunar surface 
     Rfmin = m.Const(Rfmin_py, name ='Rfmin') #final height of orbit, m    
-    orbital_v = ((G_py*M_py)/R0_py)**(1/2)
-    #print(orbital_v)
+    periapsis_v = ((G_py*M_py)/(R0_py+53110))**(1/2)
+    
+    """The pariapsis velocity (periapsis_v) is calculated by finding the velocity
+    the rocket would have in a circular orbit of radius (r_apoapsis+r_periapsis)/2.
+    r_periapsis = 17703 and r_apoapsis = 88515 """
+    
      
 
     """ Setting up Gekko Variables prone to changes"""
@@ -83,11 +91,13 @@ class Solver:
     xdot = m.Var( name='xdot')
     xdoubledot = m.Var(name='xdoubledot')
     
-    angle = m.MV(name='angle', value = 0, lb = 0, ub = np.pi/3)
-    #angle.DPRED
-    angle.STATUS = 1 #Allows computer to change angle
-    angle.DCOST = 1e-5 #Adds a very small cost to changes in angle
-    angle.REQONCTRL = 3 #tells solver whether to change MVs or run as simulator
+    angle = m.Var(name='angle', value = 0, lb = 0, ub = np.pi/3)
+    angledot = m.Var(name='angledot')
+    angledoubledot = m.MV(name='angledoubledot', lb = -1, ub = 1)
+    #angledot.DPRED
+    angledoubledot.STATUS = 1 #Allows computer to change angle
+    angledoubledot.DCOST = 1e-5 #Adds a very small cost to changes in angle
+    angledoubledot.REQONCTRL = 3 #tells solver whether to change MVs or run as simulator
     
     
     """"Scalars --it is crucial to have all the variables change at a similar scale to each other
@@ -95,7 +105,8 @@ class Solver:
     the mass scale factor"""
     
     Scalar = m.Const(Rfmin_py, name = 'distance Scale') 
-    mass_scalar = m.Const(2376, name = 'mass Scale') #The fuel mass of the rocket
+    mass_scalar = m.Const(fuel_mass, name = 'mass Scale') #The fuel mass of the rocket
+    angle_scalar = m.Const(angle_doubledot_max/3)
     
     
     """Governing Equations"""
@@ -105,6 +116,9 @@ class Solver:
     
     m.Equation(x.dt()==tf*xdot*final_time) #Expression for x velocity
     m.Equation(xdot.dt() == tf*xdoubledot*final_time) #Expression for x acceleration
+    
+    m.Equation(angle.dt() == tf*angledot*final_time) #Expression for angle
+    m.Equation(angledot.dt() == tf*angledoubledot*final_time*angle_scalar)
     
     m.Equation(mass.dt() == mflow*final_time*tf) #Expression for mass
     
@@ -120,9 +134,12 @@ class Solver:
                               ((x*Scalar)*m.cos(3*angle)-(y*Scalar+R0)*m.sin(3*angle)) )\
                - (x*Scalar)*(G*M/(((x*Scalar)**2 + (y*Scalar+R0)**2)**(3/2))))/ Scalar\
                )
+        
     """For more information about the governing equations and system dynamics, 
     reffer to the Lunar_Module_Trajectory_Optimisation.pdf file attached on the github page.
     This document was written as a school assessment, so apologies for the unconventional formating"""
+    
+    
     
     """Initial Boundary Conditions:""" 
     m.fix(y, pos=0,val=0)       #Initial y position
@@ -149,7 +166,7 @@ class Solver:
     constraint_2 = np.full(nt, 0)
     constraint_2 [-1] = 1
     final_velocity = m.Param(value = constraint_2 )
-    m.Equation((xdot**2 + ydot**2) >= (orbital_v/Scalar)**2*final_velocity)
+    m.Equation((xdot**2 + ydot**2) >= (periapsis_v/Scalar)**2*final_velocity)
     
     
     """Constraint 3: dot product of velocity and position should be zero in a circular orbit"""
@@ -158,7 +175,8 @@ class Solver:
     """Solving the Problem"""
     m.Minimize(tf) 
     m.solve(disp=True)    #solve
-    print('Optimal Solution (final time): ' + str(tf.value[0]))
+    print('Optimal Solution (final time): ' + str(tf.value[0]*470))
+    print(periapsis_v)
 
     # scaled time
     ts = m.time * tf.value[0]
@@ -170,8 +188,6 @@ class Solver:
     print('final xdoubledot', xdoubledot.value[-1]*Rfmin_py)
     print('final time', tf.value[0]*final_time)
     
-    pos_factor = 53108.4
-    pos_offset = 1738100
     y_pos_list = [0]*len(x.value)
     x_pos_list = [0]*len(x.value)
     theta_list = [0]*len(x.value)
@@ -180,21 +196,25 @@ class Solver:
         y_pos_list[i] = y.value[i]*Rfmin_py+R0_py
         theta_list[i] = 3*angle.value[i]*(180/(np.pi))
     
-    angle_1 = np.linspace(0, 2*np.pi, 100)
-    radius = 1738100
+    angle_1 = np.linspace(0, np.pi/6, 100)
     a = R0_py*np.cos(angle_1)
     b = R0_py*np.sin(angle_1)
     
-    plt1 = plt.figure()
-    ax = plt1.add_subplot()
-    plt.plot(a,b)
-    plt.plot(x_pos_list,y_pos_list)
+    circle1 = plt.Circle((0, 0), R0_py)
+    
+    fig, ax = plt.subplots()
+    #plt.plot(a,b)
+    ax.add_patch(circle1)
+    plt.plot(x_pos_list,y_pos_list, color = (0.9, 0.4, 0))
+    ax.set_ylim(R0_py-30000, R0_py+20000)
+    ax.set_xlim(-5000, 300000) 
+    
     ax.set_title('Position')
     plt.ylabel('y')
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    #plt.savefig('takeoff_contextualized.png', dpi=300)
+    plt.savefig('takeoff_contextualized.png', dpi=300)
     
     plt2 = plt.figure()
     ax = plt2.add_subplot()
@@ -203,17 +223,18 @@ class Solver:
     plt.ylabel('Angle / degrees')
     ax.set_xlabel('time')
     ax.grid()
-    #plt.savefig('Angle_vs_Time.png', dpi=300)
+    plt.savefig('Angle_vs_Time.png', dpi=300)
     
     plt3 = plt.figure()
     ax = plt3.add_subplot()
     plt.plot(x_pos_list,y_pos_list)
     ax.set_title('Position')
+    plt.ylim([R0_py-10000, R0_py+20000])
     plt.ylabel('y')
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    #plt.savefig('takeoff_trajectory.png', dpi=300)
+    plt.savefig('takeoff_trajectory.png', dpi=300)
     
     plt.show()
 
