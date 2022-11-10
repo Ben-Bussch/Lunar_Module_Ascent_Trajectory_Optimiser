@@ -60,14 +60,15 @@ class Solver:
     """Rocket Parameters"""
     Ft =  m.Const(15346, name='Ft')         #thrust force of engine in Newtons
     M0 =  m.Const(4821, name='M0')          #Wet Mass of rocket, in kg
+    Mfuel = 2376 
     M_dot =  m.Const(5.053, name='M_dot')   #Mass flow rate of propellant, kg/s
-    mflow = 5.053/2376
+    mflow = 5.053/Mfuel
     
     
     """"Orbit Parameters """
     Rfmin_py = 53108.4    #Final orbit height from lunar surface 
     Rfmin = m.Const(Rfmin_py, name ='Rfmin') #final height of orbit, m    
-    orbital_v = ((G_py*M_py)/R0_py)**(1/2)
+    orbital_v = ((G_py*M_py)/(R0_py+Rfmin_py))**(1/2)
     #print(orbital_v)
      
 
@@ -95,7 +96,7 @@ class Solver:
     the mass scale factor"""
     
     Scalar = m.Const(Rfmin_py, name = 'distance Scale') 
-    mass_scalar = m.Const(2376, name = 'mass Scale') #The fuel mass of the rocket
+    mass_scalar = m.Const(Mfuel, name = 'mass Scale') #The fuel mass of the rocket
     
     
     """Governing Equations"""
