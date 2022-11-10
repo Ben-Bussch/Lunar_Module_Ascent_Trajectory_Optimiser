@@ -68,14 +68,14 @@ class Solver:
     
     """"Orbit Parameters """
     r_periapsis = 17703
-    r_apoapsis = 88515
-    Rfmin_py = 17703                         #Final orbit periapsis, from lunar surface 
-    Rfmin = m.Const(Rfmin_py, name ='Rfmin') #final height of orbit, m    
-    periapsis_v = ((G_py*M_py)/(R0_py+53110))**(1/2)
+    r_apoapsis = 88615
+    r_avg = (r_periapsis+r_apoapsis)/2
+    Rfmin_py = r_periapsis                          #Final orbit periapsis, from lunar surface 
+    Rfmin = m.Const(Rfmin_py, name ='Rfmin')        #final height of orbit, m    
+    periapsis_v = ((G_py*M_py)/(R0_py+r_avg))**(1/2)
     
-    """The pariapsis velocity (periapsis_v) is calculated by finding the velocity
-    the rocket would have in a circular orbit of radius (r_apoapsis+r_periapsis)/2.
-    r_periapsis = 17703 and r_apoapsis = 88515 """
+    """The periapsis velocity (periapsis_v) is calculated by finding the velocity
+    the rocket would have in a circular orbit of radius (r_apoapsis+r_periapsis)/2. """
     
      
 
@@ -178,6 +178,11 @@ class Solver:
     print('Optimal Solution (final time): ' + str(tf.value[0]*470))
     print(periapsis_v)
 
+    
+
+    
+    """Solution Display"""
+    
     # scaled time
     ts = m.time * tf.value[0]
     print('final y',y.value[-1]*Rfmin_py)
