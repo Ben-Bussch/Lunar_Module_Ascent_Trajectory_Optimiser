@@ -195,7 +195,7 @@ class Solver:
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    #plt.savefig('takeoff_contextualized.png', dpi=300)
+    plt.savefig('takeoff_contextualized.png', dpi=300)
     
     plt2 = plt.figure()
     ax = plt2.add_subplot()
@@ -204,7 +204,7 @@ class Solver:
     plt.ylabel('Angle / degrees')
     ax.set_xlabel('time')
     ax.grid()
-    #plt.savefig('Angle_vs_Time.png', dpi=300)
+    plt.savefig('Angle_vs_Time.png', dpi=300)
     
     plt3 = plt.figure()
     ax = plt3.add_subplot()
@@ -214,7 +214,7 @@ class Solver:
     ax.set_xlabel('x')
     ax.grid()
     ax.set_aspect('equal')
-    #plt.savefig('takeoff_trajectory.png', dpi=300)
+    plt.savefig('takeoff_trajectory.png', dpi=300)
     
     plt.show()
 
